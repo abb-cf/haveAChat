@@ -58,6 +58,10 @@ const Start = ({ navigation }) => {
             </View>
             </View>
 
+            {/* keeps keyboards from obstructing the user's view of the screen   */}
+            { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
+            { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
+            
             <Button
             title="Begin Chat"
             onPress={() => navigation.navigate('Chat', { name: name, color: color })}
