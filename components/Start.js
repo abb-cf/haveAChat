@@ -1,4 +1,12 @@
-import { StyleSheet, View, Text, Button, TextInput, ImageBackground, TouchableOpacity } from 'react-native';
+import { 
+    StyleSheet, 
+    View, 
+    Text, 
+    Button, 
+    TextInput, 
+    ImageBackground, 
+    TouchableOpacity, 
+    KeyboardAvoidingView } from 'react-native';
 import { useState } from 'react';
 
 // set optional background colors
