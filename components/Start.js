@@ -2,14 +2,17 @@ import {
     StyleSheet, 
     View, 
     Text, 
-    Button, 
     TextInput, 
     ImageBackground, 
     TouchableOpacity, 
-    KeyboardAvoidingView } from 'react-native';
+    KeyboardAvoidingView, 
+    Alert,
+    Keyboard,
+    TouchableWithoutFeedback} from 'react-native';
 import { useState } from 'react';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
-// set optional background colors
+// set optional background colors for Chat screen
 const bgColors = {
     marigold: {backgroundColor: '#fcba03'},
     moss: {backgroundColor: '#23570b'},
@@ -17,30 +20,55 @@ const bgColors = {
     lavender: {backgroundColor: '#9e90f5'}
 }
 
+// A component that displays a transparent overlay when a color is selected
+const SelectedColorOverlay = () => <View style={styles.selectedColorOverlay} />;
+
 // using navigation to pass name and color and other State values to Chat.js
 const Start = ({ navigation }) => {
 
-    // setting the state 
+    // declaring the state 
     // name and color are to be passed to Chat.js via navigation
     const [name, setName] = useState('');
     const [color, setColor] = useState('');
+
+    // Functon to handle anonymous sign-in with Firebase Auth
+    const handleSignIn = () => {
+        const auth = getAuth();
+        signInAnonymously(auth)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                // Navigate to Chat screen with user's name, color, ID
+                navigation.navigate("Chat", {
+                    name, color: color || "#FFF", userID: user.uid,
+                });
+                Alert.alert("Signed in successfully!");
+            })
+            .catch((error) => {
+                Alert.alert("Unable to enter chat. Please try later");
+            });
+    }; 
+
+    // destructure bg color styles from backgroundColors object
     const { marigold, moss, charcoal, lavender } = bgColors;
 
     // what will render on the Start screen, 
     return (    
-    <View style={styles.container}>
-        <ImageBackground source={require('../assets/A5-chatapp-assets/bg-image.png')} style={[styles.container, styles.image]}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+        <ImageBackground 
+            source={require('../assets/A5-chatapp-assets/bg-image.png')} 
+            style={[styles.container, styles.image]}>
         
         <Text style={styles.title}>Have A Chat</Text>
         
-        <View>
             <View style={styles.inputBox}>
                 <TextInput 
                     style={styles.textInput}
                     value={name}
                     onChangeText={setName}
-                    placeholder='Type username here'
+                    placeholder='Enter your username'
                     placeholderTextColor={'#d3d3d3'}
+                    returnKeyType="done"
                 />
 
             <View>
@@ -63,20 +91,19 @@ const Start = ({ navigation }) => {
                     onPress={() => setColor(lavender.backgroundColor)}
                 />
                 </View>
-            </View>
+                
+                {/* keeps keyboards from obstructing the user's view of the screen   */}
+                { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
+                { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
             </View>
 
-            {/* keeps keyboards from obstructing the user's view of the screen   */}
-            { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
-            { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
-            
-            <Button
-            title="Begin Chat"
-            onPress={() => navigation.navigate('Chat', { name: name, color: color })}
-            />
+            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+              <Text style={styles.buttonText}>Begin Chat</Text>
+            </TouchableOpacity>
         </View> 
         </ImageBackground>
     </View>
+    </TouchableWithoutFeedback>
     );
     }
 
@@ -104,8 +131,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 15,
         paddingVertical: 20,
-        marginBottom: 15,
         justifyContent: 'space-between',
+        marginBottom: 150,
     },
     textInput: {
         height: 50,
@@ -138,8 +165,21 @@ const styles = StyleSheet.create({
     colorSelected: {
         borderStyle: 'solid',
         borderWidth: 2,
-        borderColor: '#5f5f5f',
+        borderColor: '#FFF',
     },
+    button: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: "rgba(52, 52, 52, 0.6)",
+        width: "88%",
+        height: 50,
+        borderRadius: 2,
+      },
+      buttonText: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#FFFFFF",
+      },
 });
 
 export default Start;
