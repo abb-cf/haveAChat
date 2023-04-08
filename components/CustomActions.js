@@ -7,6 +7,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
     const actionSheet = useActionSheet();
 
+    // When a user selects a custom feature to use from the Action Sheet
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
         const cancelButtonIndex = options.length - 1;
@@ -31,6 +32,14 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         );
     };
 
+    // Generate unique reference for each image sent
+    const generateReference = (uri) => {
+        const timeStamp = (new Date()).getTime();
+        const imageName = uri.split("/")[uri.split("/").length - 1];
+        return `${userID}-${timeStamp}-${imageName}`;
+    }
+
+    // Store images in Firebase storage
     const uploadAndSendImage = async (imageURI) => {
         const uniqueRefString = generateReference(imageURI);
         const newUploadRef = ref(storage, uniqueRefString);
@@ -42,6 +51,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         });
     }
 
+    // Ask permission & allow user to send image from device's media library
     const pickImage = async () => {
         let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (permissions?.granted) {
@@ -51,6 +61,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         }
     }
     
+    // Ask permission & all app to take photo using device camera
     const takePhoto = async () => {
         let permissions = await ImagePicker.requestCameraPermissionsAsync();
         if (permissions?.granted) {
@@ -60,12 +71,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
         }
     }
 
-    const generateReference = (uri) => {
-        const timeStamp = (new Date()).getTime();
-        const imageName = uri.split("/")[uri.split("/").length - 1];
-        return `${userID}-${timeStamp}-${imageName}`;
-    }
-
+    // Ask permission & get current location of user
     const getLocation = async () => {
         let permissions = await Location.requestForegroundPermissionsAsync();
         if (permissions?.granted) {
@@ -83,6 +89,9 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
 
     return (
     <TouchableOpacity 
+    accessible={true}
+    accessibilityLabel="More options"
+    accessibilityHint="Let you choose to send an image or your geolocation."
         style={styles.container}
         onPress={onActionPress}
     >

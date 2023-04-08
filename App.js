@@ -28,6 +28,8 @@ const Stack = createNativeStackNavigator();
 
 // Define the main component of the app
 const App = () => {
+
+  // Configures connection to Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyB2WogD45vcusv_kmrsXD4p9hvD5tDCqZg",
     authDomain: "haveachat-app.firebaseapp.com",
@@ -53,7 +55,6 @@ const App = () => {
     }
   }, [connectionStatus.isConnected]);
 
-  // render the App
   return (
     <NavigationContainer>
       <Stack.Navigator

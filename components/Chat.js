@@ -132,6 +132,8 @@ export default function Chat({ route, navigation, db, isConnected, storage }) {
         });
     };
 
+    // Function that displays CustomActions.js
+    // Allows user to send images and location
     const renderCustomActions = (props) => {
         return <CustomActions storage={storage} {...props} />;
     };
