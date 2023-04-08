@@ -31,7 +31,7 @@
 
 # Setting up the development environment:
 
-- Clone the repository: git clone https://github.com/mpsylvan/chat-demo
+- Clone the repository: git clone https://github.com/abb-cf/haveAChat
 
 # EXPO
 
