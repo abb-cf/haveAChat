@@ -11,6 +11,8 @@ import {
     collection, query,
     orderBy, onSnapshot, addDoc, } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
 
 // Function to customize the appearance of chat bubbles
 const renderBubble = (props) => {
@@ -35,9 +37,31 @@ const renderBubble = (props) => {
     else return null;
   };
 
+  // Function to render MapView if currentMessage contains location data
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+        return (
+            <MapView 
+                style={{width: 150,
+                        height: 100,
+                        borderRadius: 13,
+                        margin: 3}}
+                region={{
+                    latitude: currentMessage.location.latitude,
+                    longitude: currentMessage.location.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+            />
+        );
+    }
+    return null;
+  }
+
 // using route and navigation to gather name and color values passed from Start.js
 // creates State for messages and setMessages
-export default function Chat({ route, navigation, db, isConnected }) {
+export default function Chat({ route, navigation, db, isConnected, storage }) {
     const { name, userID } = route.params;
     const [messages, setMessages] = useState([]);
 
@@ -108,6 +132,10 @@ export default function Chat({ route, navigation, db, isConnected }) {
         });
     };
 
+    const renderCustomActions = (props) => {
+        return <CustomActions storage={storage} {...props} />;
+    };
+
     return (
         <TouchableWithoutFeedback>
             <View style={[styles.container, { backgroundColor: route.params.color }]}>
@@ -116,6 +144,8 @@ export default function Chat({ route, navigation, db, isConnected }) {
                 renderBubble={renderBubble}
                 renderInputToolbar={renderInputToolbar(isConnected)}
                 onSend={messages => onSend(messages)}
+                renderActions={renderCustomActions}
+                renderCustomView={renderCustomView}
                 user={{
                     _id: userID,
                     name,
